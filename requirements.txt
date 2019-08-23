@@ -16,7 +16,6 @@ defusedxml
 docutils
 emoji
 empath
-en-core-web-sm
 entrypoints
 fasttext
 gensim
