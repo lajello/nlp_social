@@ -106,3 +106,4 @@ wcwidth
 webencodings
 widgetsnbextension
 zipp
+xgboost
