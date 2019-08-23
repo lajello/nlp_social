@@ -50,7 +50,6 @@ networkx
 nltk
 notebook
 numpy
-packaging0
 pandas
 pandocfilters
 parso
