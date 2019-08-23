@@ -60,7 +60,7 @@ parso
 pexpect
 pickleshare
 Pillow
-plac=
+plac
 pluggy
 preshed
 prometheus-client
