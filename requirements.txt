@@ -44,8 +44,6 @@ matplotlib
 mistune
 more-itertools
 murmurhash
-nb-conda
-nb-conda-kernels
 nbconvert
 nbformat
 networkx
