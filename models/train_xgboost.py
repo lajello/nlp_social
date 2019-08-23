@@ -75,7 +75,6 @@ def getBaseMAP(idx):
     return
 
 def trainXGBPerformance(idx):
-    os.chdir('/home/minje/Projects/nlpfeatures')
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"] = "%d"%(idx%8)
     dims = ['social_support',
@@ -95,8 +94,7 @@ def trainXGBPerformance(idx):
 
     tokenize = TweetTokenizer().tokenize
     for n_round in range(10):
-        # for mode in ['all']:
-        for mode in ['liwc']:
+        for mode in ['all']:
         # for mode in ['word','readability','vader','linguistics','empath','hate','ngrams']:
             if mode=='word':
                 features = FeatureUnion([
