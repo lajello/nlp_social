@@ -1,0 +1,1 @@
+Files used for processing text to obtain features such as n-grams & word embeddings, which require looking at the entire dataset.
