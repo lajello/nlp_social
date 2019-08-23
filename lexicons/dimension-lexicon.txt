@@ -1,0 +1,10 @@
+Conflict: tumultuous, hate, mistrust, tense, troubled, disappointing
+Fun: fun, funny, humor, joy, laugh, laughter, playful, comedy
+Identity: community, united, identity
+Knowledge: knowledge, teaching, learning
+Power: command, authority, one sided, one-sided, pretentious
+Respect: admiration, appreciation, praise, thankful, respect
+Romance: sexual, attraction, intimate, selfless, symbiotic, partnership, affection
+Similarity: similar, same, similarity, alike
+Social support: supportive, amicable, caring, cordial, empathy, sympathy, understanding, kindness, calming, companionship
+Trust: reliable, trust, dependable, loyalty, accountability

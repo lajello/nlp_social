@@ -1,0 +1,10 @@
+social_support: friendly, friendliness, friendship, support, supportive, amicable, caring, cordial, compassion, empathy, sympathy, understanding, kindness, calming, companionship, close, closeness, encouragement
+conflict: conflict, tumultuous, hate, hatred, mistrust, tense, troubled, disappointing, distant, betrayal, dishonest, hostility, hostile, resentment, fight, antagonism
+trust: trust, trustworthy, honest, honesty, reliable, reliability, dependable, dependability, loyal, loyalty, accountable, accountability, faith, faithfulness
+fun: fun, funny, humor, joy, joyous, laugh, laughter, playful, comedy, cheer, enjoy, amusing, amusement, entertaining
+similarity: similar, same, similarity, alike, compatible, compatibility, equal, equality, congenial, affinity, agreement, agree, homogeneous
+identity: community, united, identity, cohesive, integrated
+respect: admiration, appreciation, praise, thankful, respect, grateful, fondness, recognition, honor, esteem, applause
+romance: love, sex, sexual, attraction, attractive, intimacy, intimate, selfless, symbiotic, partnership, affection, unconditional, emotional, couple, marriage
+knowledge: knowledge, teaching, learning, intelligence, interest, competent, competence, listening, expertise, know-how, insight
+power: command, control, dominance, prestige, fame, influence, authority, one sided, one-sided, pretentious, advantageous, beneficial, business, decisions
