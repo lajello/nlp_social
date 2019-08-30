@@ -2,7 +2,10 @@ import os
 from os.path import join
 import pandas as pd
 import sys
-sys.path.append(os.getcwd())
+model_dir = '### set this as the directory where the models and features directories are'
+model_dir = '/home/minje/Projects/nlpfeatures'
+sys.path.append(model_dir)
+os.chdir(model_dir)
 from models.lstm import LSTMClassifier
 from features.embedding_features import ExtractWordEmbeddings
 import torch
@@ -13,6 +16,8 @@ tokenize = TweetTokenizer().tokenize
 from time import time
 
 def getEnronScores(dim):
+
+    # load pretrained model for dimension
     is_cuda = True
     model = LSTMClassifier(embedding_dim=300, hidden_dim=300)
     if is_cuda:
@@ -36,34 +41,46 @@ def getEnronScores(dim):
             print("Loaded model")
             break
 
-    df = pd.read_csv('/10TBdrive/minje/datasets/enron-texts/all-date-texts.tsv', sep='\t').dropna()
+    # load data
+    df = pd.read_csv('/10TBdrive/minje/datasets/enron/processed/df.mails.tsv', sep='\t')
+    df = df[['date','text']].drop_duplicates()
     out = []
     start = time()
     cnt = 0
-    for day,text in df[['date','text']].values:
+
+    # get scores for each sample
+    for day,text in df.values:
         cnt+=1
         if cnt%1000==0:
             print(cnt,int(time()-start))
-        # if cnt>10000:
-        #     break
         sents = sent_tokenize(text)
         sent_scores = []
+
         for sent in sents:
+
+            # change date into vectors
             input_ = em.obtain_vectors_from_sentence(tokenize(sent), True)
             input_ = torch.tensor(input_).float().unsqueeze(0)
             if is_cuda:
                 input_ = input_.cuda()
+
+            # get score between 0-1 for each sentence
             o = model(input_)
             o = torch.sigmoid(o).item()
             sent_scores.append(o)
+
+        # get max and mean score of an email
         idx = np.argmax(sent_scores)
         max_sent = sents[idx]
         out.append((day,dim,max_sent,np.mean(sent_scores),np.max(sent_scores)))
     df_out = pd.DataFrame(out,columns=['date','dimension','max_sent','mean','max'])
-    df_out.to_csv('/10TBdrive/minje/datasets/enron-texts/all-date-texts_%s.tsv'%dim, sep='\t',index=False)
+    df_out.to_csv('/10TBdrive/minje/datasets/enron/processed/scores/date-texts_%s.tsv'%dim, sep='\t',index=False)
     return
 
 
 
 if __name__=='__main__':
-    getEnronScores(sys.argv[1])
+    for dim in ['social_support','conflict','trust','knowledge','romance','identity','similarity',
+                'power','respect','fun']:
+        getEnronScores(dim)
+    # getEnronScores(sys.argv[1])

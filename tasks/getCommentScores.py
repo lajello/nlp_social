@@ -1,11 +1,17 @@
+# a code for calculating the comment scores of each comment in Reddit using LSTMs
+# the output line is
+# max score of comment, mean score of comment, user, subreddit name, region, location, sentence with max score
+
 import os
 from os.path import join
 import sys
-sys.path.append(os.getcwd())
+model_dir = '/home/minje/Projects/nlpfeatures'
+sys.path.append(model_dir)
+os.chdir(model_dir)
 
 import torch
 import gzip
-import gc
+import numpy as np
 import ujson as json
 from features.embedding_features import ExtractWordEmbeddings
 from models.lstm import LSTMClassifier
@@ -14,29 +20,15 @@ tokenize = TweetTokenizer().tokenize
 from nltk import sent_tokenize
 from preprocessing.customDataLoader import preprocessText,padBatch
 
-# from torch import nn, optim
-# from preprocessing.customDataLoader import getLeaveOneOutData,batchify,padBatch
-# import numpy as np
-# from sklearn.metrics import roc_auc_score,recall_score,accuracy_score
-# from sklearn.utils import shuffle
-# from time import time
-# import pandas as pd
-# from collections import Counter
-# import re
-# from sklearn.model_selection import train_test_split
-# from imblearn.under_sampling import RandomUnderSampler
-# from preprocessing.customDataLoader import loadDataFromPandas,preprocessText
-
 def writeScores(tup):
     dim,n_file,n_set = tup
-    # dim = 'conflict'
 
     # get score for comment
     from time import time
     start = time()
     cnt = 0
-    data_dir = '/10TBdrive/minje/datasets/reddit/comments/processed/'
-    save_dir = '/10TBdrive/minje/datasets/reddit/comments/expression-filtering/%s' % dim
+    data_dir = '/10TBdrive/minje/datasets/reddit/comments/geotagged/'
+    save_dir = '/10TBdrive/minje/datasets/reddit/comments/scores/%s' % dim
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
@@ -55,7 +47,7 @@ def writeScores(tup):
             model.cuda()
         model.eval()
 
-        model_dir = 'results/performance/lstm/'
+        model_dir = '/10TBdrive/minje/models/lstm/'
         for modelname in os.listdir(model_dir):
             if ('-best.lstm' in modelname) & (dim in modelname):
                 best_state = torch.load(join(model_dir, modelname))
@@ -75,31 +67,18 @@ def writeScores(tup):
             for ln, line in enumerate(f):
                 if ln<n_set:
                     continue
-                elif ln>=(n_set+100000):
+                # elif ln>=(n_set+100000):
+                elif ln >= (n_set + 1000):
                     break
                 else:
-                # if (ln % 10000 == 0) & (ln >0):
-                #     print(dim, filename, ln, int((time() - start)/60), cnt)
-                #     gc.collect()
                     try:
                         obj = json.loads(line.decode('utf-8'))
                         sents = sent_tokenize(preprocessText(obj['text']))
-                        user, reg, loc = obj['user'], obj['region'], obj['location']
+                        sents = [x for x in sents if len(x.split())>=5]
+                        user, reg, loc, sub = obj['user'], obj['region'], obj['location'], obj['subreddit']
                     except:
                         continue
-                    # inputs = torch.tensor(padBatch([em.obtain_vectors_from_sentence(sent, True) for sent in sents])).float()
-                    # if is_cuda:
-                    #     inputs = inputs.cuda()
-                    # scores = torch.sigmoid(model(inputs)).tolist()
-                    # if type(scores)==float:
-                    #     s = scores
-                    # else:
-                    #     s = max(scores)
-                    # if s>=0.9:
-                    #     cnt += 1
-                    #     outf.write('\t'.join([str(round(s, 3)), user, reg, loc, sents]) + '\n')
-                    #
-                    #
+
                     scores = []
                     for sent in sents:
                         # sent = preprocessText(sent)
@@ -111,10 +90,9 @@ def writeScores(tup):
                         s = torch.sigmoid(s).item()
                         scores.append(s)
                     try:
-                        s = max(scores)
-                        if s >= 0.6:
-                            cnt += 1
-                            outf.write('\t'.join([str(round(s, 3)), user, reg, loc, ' '.join(sents)]) + '\n')
+                        idx,mx,mean = np.argmax(scores),np.max(scores),np.mean(scores)
+                        outf.write('\t'.join([str(round(mx, 3)),str(round(mean,3)), user, sub, reg, loc, sents[idx]]) + '\n')
+                        cnt+=1
                     except:
                         continue
         print("Completed %s\tcount: %d\tminutes: %d"%(filename,cnt,int(time()/60-start/60)))
@@ -125,17 +103,17 @@ if __name__=='__main__':
     from multiprocessing import Pool
     # writeScores(0)
     inputs = []
-    # dims = ['social_support',
-    #         'conflict',
-    #         'trust',
-    #         'fun',
-    #         'similarity',
-    #         'identity',
-    #         'respect',
-    #         'romance',
-    #         'knowledge',
-    #         'power']
-    dims = ['identity']
+    dims = ['social_support',
+            'conflict',
+            'trust',
+            'fun',
+            'similarity',
+            'identity',
+            'respect',
+            'romance',
+            'knowledge',
+            'power']
+    dims = ['power']
     n_files = list(range(12))
     n_sets = list(range(0,12000000,100000))
     for n1 in n_files:
@@ -143,7 +121,7 @@ if __name__=='__main__':
             for dim in dims:
                 inputs.append((dim,n1,n2))
     try:
-        pool = Pool(4)
+        pool = Pool(2)
         pool.map(writeScores,inputs)
     finally:
         pool.close()
